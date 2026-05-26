@@ -123,9 +123,16 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
 
           <button
             type="button"
-            onClick={onToggleMute}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
+            onPointerDown={onToggleMute}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onToggleMute()
+              }
+            }}
+            className="inline-flex h-10 min-w-[44px] items-center justify-center rounded-2xl bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
             aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
+            style={{ touchAction: 'manipulation' }}
           >
             <SoundBarIcon level={audioLevel} />
           </button>
@@ -177,9 +184,16 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
           </button>
           <button
             type="button"
-            onClick={onToggleMute}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
+            onPointerDown={onToggleMute}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                onToggleMute()
+              }
+            }}
+            className="inline-flex h-10 min-w-[44px] items-center justify-center rounded-2xl bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
             aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
+            style={{ touchAction: 'manipulation' }}
           >
             <SoundBarIcon level={audioLevel} />
           </button>

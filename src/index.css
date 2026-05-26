@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -42,10 +42,10 @@
   --color-border: 216 208 191;
   --color-border-light: 233 224 206;
   --canvas-bg: #f7f5ef;
-  --hexagon-glow: rgba(191, 165, 106, 0.24);
-  --hexagon-dim: rgba(0, 0, 0, 0.1);
-  --hero-overlay-bottom: rgba(0, 0, 0, 0.06);
-  --hero-grid-top: rgba(0, 0, 0, 0.05);
+  --hexagon-glow: rgba(24, 63, 112, 0.24);
+  --hexagon-dim: rgba(24, 63, 112, 0.12);
+  --hero-overlay-bottom: rgba(24, 63, 112, 0.06);
+  --hero-grid-top: rgba(24, 63, 112, 0.05);
 }
 
 * {
@@ -93,6 +93,45 @@ body {
   opacity: 0.3;
 }
 
+.profile-card {
+  perspective: 1200px;
+  display: inline-block;
+}
+
+.profile-card img {
+  transform: translateZ(0);
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-card-inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out;
+}
+
+.spin-coin {
+  animation: coin-spin 0.7s ease-in-out;
+}
+
+@keyframes coin-spin {
+  0% {
+    transform: perspective(1200px) rotateX(0deg) rotateY(0deg) scale(1);
+  }
+  25% {
+    transform: perspective(1200px) rotateX(10deg) rotateY(140deg) scale(0.98);
+  }
+  50% {
+    transform: perspective(1200px) rotateX(8deg) rotateY(260deg) scale(0.97);
+  }
+  100% {
+    transform: perspective(1200px) rotateX(0deg) rotateY(360deg) scale(1);
+  }
+}
+
 .app-page {
   min-height: 100vh;
 }
@@ -124,7 +163,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 600;
   line-height: 1.2;
 }

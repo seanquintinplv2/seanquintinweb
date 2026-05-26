@@ -24,7 +24,7 @@ export default {
       },
       fontFamily: {
         primary: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Playfair Display', 'Georgia', 'serif'],
+        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.8s ease forwards',

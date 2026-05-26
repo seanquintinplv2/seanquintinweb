@@ -75,7 +75,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow: hidden;
+  overflow-x: hidden;
   transition: background 0.4s ease, color 0.4s ease;
 }
 
@@ -95,8 +95,6 @@ body {
 
 .app-page {
   min-height: 100vh;
-  max-height: 100vh;
-  overflow-y: auto;
 }
 
 * {
@@ -123,12 +121,6 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgb(var(--color-border-light));
-}
-
-.app-page {
-  min-height: 100vh;
-  max-height: 100vh;
-  overflow-y: auto;
 }
 
 h1, h2, h3, h4, h5, h6 {

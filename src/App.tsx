@@ -6,7 +6,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import HexagonalBackground from './components/HexagonalBackground'
 import Navbar from './components/Navbar'
-import { loadClickSound, playButtonClickSound } from './utils/sound'
+import { getAudioContext, loadClickSound, playButtonClickSound } from './utils/sound'
 
 type Page = 'home' | 'about' | 'projects' | 'contact'
 
@@ -16,7 +16,8 @@ function App() {
   const [pageReady, setPageReady] = useState(false)
   const [transitionStage, setTransitionStage] = useState<'idle' | 'closing' | 'opening'>('opening')
   const [transitionVariant, setTransitionVariant] = useState<'about' | 'projects' | 'contact' | 'home-return'>('about')
-  const [audioMuted, setAudioMuted] = useState(true)
+  const [audioMuted, setAudioMuted] = useState(false)
+  const [audioLevel, setAudioLevel] = useState(0)
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     if (typeof window === 'undefined') return 'dark'
     const saved = window.localStorage.getItem('theme')
@@ -26,6 +27,9 @@ function App() {
   const transitionTimer = useRef<number | undefined>()
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const audioMutedRef = useRef(audioMuted)
+  const analyserRef = useRef<AnalyserNode | null>(null)
+  const sourceRef = useRef<MediaElementAudioSourceNode | null>(null)
+  const animationRef = useRef<number | null>(null)
   const audioSrc = new URL('../assets/bgsound.mp3', import.meta.url).href
 
   useEffect(() => {
@@ -46,6 +50,48 @@ function App() {
   useEffect(() => {
     audioMutedRef.current = audioMuted
   }, [audioMuted])
+
+  useEffect(() => {
+    const audioEl = audioRef.current
+    if (!audioEl) return
+
+    const ctx = getAudioContext()
+    if (!ctx) return
+
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {})
+    }
+
+    if (!sourceRef.current) {
+      sourceRef.current = ctx.createMediaElementSource(audioEl)
+    }
+
+    if (!analyserRef.current) {
+      analyserRef.current = ctx.createAnalyser()
+      analyserRef.current.fftSize = 128
+      sourceRef.current.connect(analyserRef.current)
+      analyserRef.current.connect(ctx.destination)
+    }
+
+    const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount)
+
+    const updateLevel = () => {
+      if (!analyserRef.current) return
+      analyserRef.current.getByteFrequencyData(dataArray)
+      const sum = dataArray.reduce((acc, value) => acc + value, 0)
+      const level = sum / dataArray.length / 255
+      setAudioLevel(level)
+      animationRef.current = window.requestAnimationFrame(updateLevel)
+    }
+
+    animationRef.current = window.requestAnimationFrame(updateLevel)
+
+    return () => {
+      if (animationRef.current !== null) {
+        window.cancelAnimationFrame(animationRef.current)
+      }
+    }
+  }, [])
 
   useEffect(() => {
     loadClickSound().catch(() => {})
@@ -151,6 +197,7 @@ function App() {
         onToggleTheme={toggleTheme}
         audioMuted={audioMuted}
         onToggleMute={() => setAudioMuted((current) => !current)}
+        audioLevel={audioLevel}
       />
       {showIntroOverlay && (
         <div className="intro-overlay">

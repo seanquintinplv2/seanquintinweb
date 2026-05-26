@@ -8,6 +8,7 @@ interface NavbarProps {
   theme: 'dark' | 'light'
   onToggleTheme: () => void
   audioMuted: boolean
+  audioLevel: number
   onToggleMute: () => void
 }
 
@@ -18,7 +19,7 @@ const navLinks: Array<{ name: string; page: Page }> = [
   { name: 'Contact', page: 'contact' },
 ]
 
-function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, onToggleMute }: NavbarProps) {
+function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audioLevel, onToggleMute }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [hideNav, setHideNav] = useState(false)
   const [scrolled, setScrolled] = useState(false)
@@ -48,6 +49,26 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, onTo
   const handleNavigate = (page: Page) => {
     setMenuOpen(false)
     onNavigate(page)
+  }
+
+  const SoundBarIcon = ({ level }: { level: number }) => {
+    const baseHeights = [0.26, 0.55, 0.40, 0.72]
+    const normalized = audioMuted ? 0.08 : Math.max(0.08, Math.min(1, level * 1.2 + 0.08))
+
+    return (
+      <span className="inline-flex items-end justify-center gap-1">
+        {baseHeights.map((base, index) => {
+          const height = Math.max(4, Math.round((base + normalized * (index + 1) * 0.18) * 20))
+          return (
+            <span
+              key={index}
+              className="block w-1.5 rounded-full bg-current transition-all duration-100"
+              style={{ height: `${height}px`, opacity: audioMuted ? 0.4 : 1 }}
+            />
+          )
+        })}
+      </span>
+    )
   }
 
   return (
@@ -86,15 +107,15 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, onTo
           <button
             type="button"
             onClick={onToggleTheme}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
             aria-label="Toggle theme"
           >
             {theme === 'dark' ? (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
                 <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79Z" />
               </svg>
             ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
                 <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.36-7.36-1.42 1.42M7.05 16.95l-1.42 1.42M19.78 16.95l-1.42-1.42M7.05 7.05 5.64 5.64M12 6a6 6 0 100 12 6 6 0 000-12Z" />
               </svg>
             )}
@@ -103,20 +124,10 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, onTo
           <button
             type="button"
             onClick={onToggleMute}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
             aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
           >
-            {audioMuted ? (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
-                <path d="M16.5 12a4.5 4.5 0 0 0-2.67-4.13v8.26A4.5 4.5 0 0 0 16.5 12Zm-2.57-6.15A8 8 0 0 1 18 12a8 8 0 0 1-4.07 6.83M5 9.5v5h4l5 5V4.5L9 9.5H5Z" />
-              </svg>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
-                <path d="M16.5 12a4.5 4.5 0 0 0-2.67-4.13v8.26A4.5 4.5 0 0 0 16.5 12Zm-2.57-6.15A8 8 0 0 1 18 12a8 8 0 0 1-4.07 6.83M5 9.5v5h4l5 5V4.5L9 9.5H5Z" />
-                <path d="M19 5 5 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                <path d="M5 5 19 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-            )}
+            <SoundBarIcon level={audioLevel} />
           </button>
 
           <button
@@ -151,18 +162,26 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, onTo
           <button
             type="button"
             onClick={onToggleTheme}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
             aria-label="Toggle theme"
           >
-            {theme === 'dark' ? '🌙' : '☀️'}
+            {theme === 'dark' ? (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79Z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.36-7.36-1.42 1.42M7.05 16.95l-1.42 1.42M19.78 16.95l-1.42-1.42M7.05 7.05 5.64 5.64M12 6a6 6 0 100 12 6 6 0 000-12Z" />
+              </svg>
+            )}
           </button>
           <button
             type="button"
             onClick={onToggleMute}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-surface/90 text-text transition hover:bg-primary/15 hover:text-primary shadow-sm shadow-black/20"
             aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
           >
-            {audioMuted ? '🔇' : '🔊'}
+            <SoundBarIcon level={audioLevel} />
           </button>
         </div>
       </div>

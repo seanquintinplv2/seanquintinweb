@@ -8,9 +8,7 @@ function Footer({ onNavigate }: FooterProps) {
   const footerLinks = [
     { name: 'Home', href: '#home', page: 'home' as const },
     { name: 'About', href: '#about', page: 'about' as const },
-    { name: 'Services', href: '#services' },
     { name: 'Projects', href: '#projects', page: 'projects' as const },
-    { name: 'Partnership', href: '#partnership' },
     { name: 'Contact', href: '#contact', page: 'contact' as const },
   ]
 

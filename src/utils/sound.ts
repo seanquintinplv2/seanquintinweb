@@ -2,7 +2,7 @@ let audioContext: AudioContext | null = null
 let clickBuffer: AudioBuffer | null = null
 const clickSoundUrl = new URL('../../assets/clicksound.mp3', import.meta.url).href
 
-const getAudioContext = (): AudioContext | null => {
+export const getAudioContext = (): AudioContext | null => {
   if (typeof window === 'undefined') return null
   const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext
   if (!AudioContextClass) return null

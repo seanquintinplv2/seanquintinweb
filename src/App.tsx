@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import Hero from './components/Hero'
 import About from './components/About'
 import Projects from './components/Projects'
@@ -6,6 +7,7 @@ import Contact from './components/Contact'
 import Footer from './components/Footer'
 import HexagonalBackground from './components/HexagonalBackground'
 import Navbar from './components/Navbar'
+import { PageTransition } from './components/PageTransition'
 import { getAudioContext, loadClickSound, playButtonClickSound } from './utils/sound'
 
 type Page = 'home' | 'about' | 'projects' | 'contact'
@@ -207,9 +209,15 @@ function App() {
       )}
       <div className={`app transition-all duration-700 ${introComplete ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
         <main className={`app-page min-h-screen ${pageReady ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'} transition-all duration-500`}>
-          {renderPage()}
+          <AnimatePresence mode="wait">
+            <PageTransition key={activePage} page={activePage}>
+              {renderPage()}
+            </PageTransition>
+          </AnimatePresence>
         </main>
-        {activePage === 'home' ? null : <Footer onNavigate={navigateTo} />}
+        <AnimatePresence mode="wait">
+          {activePage !== 'home' && <Footer onNavigate={navigateTo} />}
+        </AnimatePresence>
       </div>
     </>
   )

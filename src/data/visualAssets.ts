@@ -21,6 +21,7 @@ export const featureAssets = {
   simulationFrame: new URL('../../assets/simulation.jfif', import.meta.url).href,
   frontCar: new URL('../../assets/Front Lowpoly car.png', import.meta.url).href,
   goldenFeather: new URL('../../assets/Golden Feather.png', import.meta.url).href,
+  kamora: new URL('../../assets/kamora.png', import.meta.url).href,
 }
 
 export const videoAssets = {
@@ -52,21 +53,24 @@ export const contactDecor = [
 ]
 
 export const visualAssets = [
+  // 1st: Websites
+  { title: 'Malanday Website', type: 'image', src: new URL('../../assets/Website malanday.png', import.meta.url).href },
+  { title: 'Website Showcase', type: 'image', src: new URL('../../assets/website1.png', import.meta.url).href },
+  { title: 'Website Showcase2', type: 'image', src: new URL('../../assets/kamora.png', import.meta.url).href },
+
+  // 2nd: Visual / creative / design / games assets
   { title: 'Appcase Identity', type: 'image', src: new URL('../../assets/appcase logo.jpg', import.meta.url).href },
   { title: 'Burning Coal Study', type: 'image', src: new URL('../../assets/Burning coal.png', import.meta.url).href },
   { title: 'Profile Capture', type: 'image', src: new URL('../../assets/profile.jpg', import.meta.url).href },
   { title: 'Resume Portrait', type: 'image', src: new URL('../../assets/DE GUZMAN, SEAN QUINTIN_Resume.jpg', import.meta.url).href },
-  { title: 'Lowpoly Car Concept', type: 'image', src: new URL('../../assets/Front Lowpoly car.png', import.meta.url).href },
   { title: 'Golden Feather', type: 'image', src: new URL('../../assets/Golden Feather.png', import.meta.url).href },
   { title: 'Latern of Courage', type: 'image', src: new URL('../../assets/Latern of Courage.png', import.meta.url).href },
   { title: 'Lexi Illustration', type: 'image', src: new URL('../../assets/Lexi.png', import.meta.url).href },
-  { title: 'Malanday Website', type: 'image', src: new URL('../../assets/Website malanday.png', import.meta.url).href },
   { title: 'Digital Anger', type: 'image', src: new URL('../../assets/anger.png', import.meta.url).href },
   { title: 'CoinBooster Design', type: 'image', src: new URL('../../assets/coinbooster.jpg', import.meta.url).href },
   { title: 'Product Donut', type: 'image', src: new URL('../../assets/donut.png', import.meta.url).href },
   { title: 'Expression Frame', type: 'image', src: new URL('../../assets/expression.png', import.meta.url).href },
   { title: 'Fear Study', type: 'image', src: new URL('../../assets/fear.png', import.meta.url).href },
-  { title: 'Final Expression', type: 'video', src: new URL('../../assets/final expression.mp4', import.meta.url).href },
   { title: 'Finalizing Expression', type: 'image', src: new URL('../../assets/finalizing expression.png', import.meta.url).href },
   { title: 'Intern Gallery 1', type: 'image', src: new URL('../../assets/intern_pic_1.jfif', import.meta.url).href },
   { title: 'Intern Gallery 2', type: 'image', src: new URL('../../assets/intern_pic_2.jfif', import.meta.url).href },
@@ -77,13 +81,15 @@ export const visualAssets = [
   { title: 'Lexi Variant', type: 'image', src: new URL('../../assets/lexi2.png', import.meta.url).href },
   { title: 'Pose Study', type: 'image', src: new URL('../../assets/pose1.png', import.meta.url).href },
   { title: 'Recreating Moment', type: 'image', src: new URL('../../assets/recreating.png', import.meta.url).href },
-  { title: 'Resume Download', type: 'pdf', src: new URL('../../assets/resume (3).pdf', import.meta.url).href, preview: new URL('../../assets/DE GUZMAN, SEAN QUINTIN_Resume.jpg', import.meta.url).href },
   { title: 'Sad Portrait', type: 'image', src: new URL('../../assets/sad.png', import.meta.url).href },
-  { title: 'Simulation Video', type: 'video', src: new URL('../../assets/simulation vid.mp4', import.meta.url).href },
-  { title: 'Simulation Frame', type: 'image', src: new URL('../../assets/simulation.jfif', import.meta.url).href },
   { title: 'Tears of Forgotten', type: 'image', src: new URL('../../assets/tears of forgotten.png', import.meta.url).href },
+  { title: 'Final Expression', type: 'video', src: new URL('../../assets/final expression.mp4', import.meta.url).href },
+  { title: 'Simulation Video', type: 'video', src: new URL('../../assets/simulation vid.mp4', import.meta.url).href },
   { title: 'Video Expression', type: 'video', src: new URL('../../assets/video expression.mp4', import.meta.url).href },
-  { title: 'Website Showcase', type: 'image', src: new URL('../../assets/website1.png', import.meta.url).href },
+  { title: 'Resume Download', type: 'pdf', src: new URL('../../assets/resume (3).pdf', import.meta.url).href, preview: new URL('../../assets/DE GUZMAN, SEAN QUINTIN_Resume.jpg', import.meta.url).href },
+
+  // 3rd: 3D made
+  { title: 'Lowpoly Car Concept', type: 'image', src: new URL('../../assets/Front Lowpoly car.png', import.meta.url).href },
 ]
 
 export const resumeAsset = {

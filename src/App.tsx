@@ -41,6 +41,16 @@ function App() {
   }, [theme])
 
   useEffect(() => {
+    document.body.style.overflow = activePage === 'home' ? 'hidden' : 'auto'
+    document.documentElement.style.overflow = activePage === 'home' ? 'hidden' : 'auto'
+
+    return () => {
+      document.body.style.overflow = 'auto'
+      document.documentElement.style.overflow = 'auto'
+    }
+  }, [activePage])
+
+  useEffect(() => {
     if (!audioRef.current) return
 
     audioRef.current.muted = audioMuted

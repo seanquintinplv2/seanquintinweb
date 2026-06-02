@@ -1,5 +1,3 @@
-import { contactDecor, resumeAsset } from '../data/visualAssets'
-
 function Contact() {
   return (
     <section id="contact" className="py-24 bg-background-secondary relative overflow-hidden">
@@ -20,14 +18,14 @@ function Contact() {
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background text-2xl">📧</span>
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">Email</h4>
-                  <a href="mailto:seanquintin@example.com" className="text-text hover:text-primary transition-colors">seanquintin@example.com</a>
+                  <a href="mailto:seanquintin@example.com" className="text-text hover:text-primary transition-colors">seanquintindeguzman22@gmail.com</a>
                 </div>
               </div>
               <div className="flex items-center gap-4 py-4 border-b border-border">
                 <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-background text-2xl">📱</span>
                 <div>
                   <h4 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-1">Phone</h4>
-                  <a href="tel:+1234567890" className="text-text hover:text-primary transition-colors">+1 (234) 567-890</a>
+                  <a href="tel:+639760519110" className="text-text hover:text-primary transition-colors">+63 9760519110</a>
                 </div>
               </div>
               <div className="flex items-center gap-4 py-4">
@@ -108,22 +106,6 @@ function Contact() {
                 Send Message
               </button>
             </form>
-
-            <div className="mt-10 space-y-4 rounded-[2rem] border border-border bg-background p-5">
-              <div className="grid gap-3 sm:grid-cols-3">
-                {contactDecor.map((item) => (
-                  <div key={item.label} className="overflow-hidden rounded-3xl border border-border bg-surface">
-                    <img src={item.src} alt={item.label} className="h-32 w-full object-cover" />
-                  </div>
-                ))}
-              </div>
-              <div className="rounded-3xl border border-border bg-surface p-4">
-                <p className="text-sm uppercase tracking-[0.28em] text-text-muted mb-2">Career portfolio</p>
-                <a href={resumeAsset.pdf} target="_blank" rel="noreferrer" className="inline-flex items-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-black transition-all hover:bg-primary-hover">
-                  Download Resume
-                </a>
-              </div>
-            </div>
           </div>
         </div>
       </div>

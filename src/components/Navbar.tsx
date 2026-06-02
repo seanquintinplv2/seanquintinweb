@@ -53,6 +53,10 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
     onNavigate(page)
   }
 
+  if (activePage === 'home') {
+    return null
+  }
+
   return (
     <motion.nav 
       initial={{ y: 0 }}

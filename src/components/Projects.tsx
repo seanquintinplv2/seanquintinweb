@@ -8,29 +8,29 @@ interface ProjectsProps {
 
 const featuredProjects = [
   {
-    category: 'Brand & Web',
-    title: 'Malanday Concept System',
-    description: 'A premium brand experience built for a modern digital platform with elevated visual storytelling.',
+    category: 'Website',
+    title: 'Malanday Edutrack',
+    description: 'Developed a web-based document request system with QR code integration for faster processing and verification.',
     type: 'image',
     src: featureAssets.malanday,
-    tags: ['Brand', 'Web', 'Visual'],
+    tags: ['Database', 'School Website', 'QR Code'],
     size: 'large'
   },
   {
-    category: 'Motion Study',
-    title: 'Final Expression Film',
-    description: 'A cinematic motion piece showcasing expressive character design and fluid storytelling.',
-    type: 'video',
-    src: videoAssets.finalExpression,
-    tags: ['Video', 'Animation', 'Art Direction'],
+    category: 'Website',
+    title: 'PaWook Website UI',
+    description: 'Developed a fast-food restaurant frontend interface with responsive design and user-centered experience. ',
+    type: 'image',
+    src: featureAssets.website1,
+    tags: ['Website', 'UI Design', 'User Experience'],
     size: 'medium'
   },
   {
-    category: 'Interface Design',
-    title: 'Interactive Gallery',
-    description: 'A sleek interface concept that balances polished visuals with intuitive navigation.',
+    category: 'Website',
+    title: 'Kamora',
+    description: 'Developed a modern restaurant frontend interface emphasizing responsive design and user-centered experience.',
     type: 'image',
-    src: featureAssets.website1,
+    src: featureAssets.kamora,
     tags: ['UI', 'Experience', 'Design'],
     size: 'medium'
   },

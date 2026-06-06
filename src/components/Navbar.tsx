@@ -175,7 +175,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
           </motion.button>
 
           {/* Mobile Menu Toggle */}
-          {activePage !== 'home' && (
+          {(activePage as Page) !== 'home' && (
             <motion.button
               type="button"
               onClick={() => setMenuOpen((current) => !current)}
@@ -214,7 +214,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
 
       {/* Mobile Menu */}
       <AnimatePresence>
-        {menuOpen && activePage !== 'home' && (
+        {menuOpen && (activePage as Page) !== 'home' && (
           <>
             <motion.div
               initial={{ opacity: 0 }}

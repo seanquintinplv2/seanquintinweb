@@ -1,6 +1,6 @@
 import { featureAssets, visualAssets, videoAssets } from '../data/visualAssets'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type ProjectItem = {
   category: string
@@ -87,24 +87,6 @@ const archiveProjects: ProjectItem[] = visualAssets.map((asset, index) => ({
 
 const allProjects: ProjectItem[] = [...featuredProjects, ...archiveProjects]
 
-const getSizeClasses = (size: string) => {
-  switch(size) {
-    case 'large': return 'md:col-span-2 md:row-span-2'
-    case 'medium': return 'md:col-span-1 md:row-span-1'
-    case 'small': return 'md:col-span-1 md:row-span-1'
-    default: return 'md:col-span-1'
-  }
-}
-
-const getImageHeight = (size: string) => {
-  switch(size) {
-    case 'large': return 'h-96 md:h-full'
-    case 'medium': return 'h-72'
-    case 'small': return 'h-64'
-    default: return 'h-72'
-  }
-}
-
 function ProjectCard({ project, index, onOpen }: { project: ProjectItem, index: number, onOpen: () => void }) {
   const [isHovered, setIsHovered] = useState(false)
 
@@ -112,15 +94,15 @@ function ProjectCard({ project, index, onOpen }: { project: ProjectItem, index: 
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.6 }}
+      transition={{ delay: index * 0.06, duration: 0.6 }}
       viewport={{ once: true, margin: '-100px' }}
-      className={`${getSizeClasses(project.size)} group relative overflow-hidden rounded-2xl cursor-pointer`}
+      className="group relative overflow-hidden rounded-[2rem] border border-border bg-background-tertiary shadow-[0_18px_50px_rgba(0,0,0,0.18)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.22)] cursor-pointer"
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
       onClick={onOpen}
     >
       {/* Background media */}
-      <div className={`relative w-full ${getImageHeight(project.size)} overflow-hidden bg-background-tertiary`}>
+      <div className="relative aspect-[4/3] overflow-hidden bg-background-tertiary sm:aspect-[16/11]">
         {project.type === 'video' ? (
           <video 
             src={project.src} 
@@ -215,6 +197,23 @@ function ProjectCard({ project, index, onOpen }: { project: ProjectItem, index: 
 }
 
 function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectItem | null, onClose: () => void, onNext: () => void, onPrev: () => void }) {
+  useEffect(() => {
+    document.body.classList.add('modal-open')
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.body.classList.remove('modal-open')
+    }
+  }, [onClose])
+
   if (!project) return null
 
   return (
@@ -224,15 +223,19 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
       exit={{ opacity: 0 }}
       onClick={onClose}
       className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-sm"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="project-modal-title"
     >
-      <motion.div
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}
-        className="absolute inset-0 m-4 mx-auto flex min-h-0 max-h-[calc(100%-2rem)] w-full max-w-6xl items-center justify-center"
-      >
-        <div className="relative w-full max-h-[calc(100vh-3.5rem)] h-auto overflow-hidden rounded-[2rem] bg-background-secondary shadow-2xl border border-white/10">
+      <div className="absolute inset-0 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8">
+        <motion.div
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          onClick={(e) => e.stopPropagation()}
+          className="relative mx-auto flex w-full max-w-6xl items-start justify-center"
+        >
+        <div className="w-full max-h-[calc(min(100vh,100dvh)-4rem)] overflow-hidden rounded-[2rem] bg-background-secondary shadow-2xl border border-white/10">
           <button
             onClick={onClose}
             className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition-colors backdrop-blur-md"
@@ -243,8 +246,8 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
             </svg>
           </button>
 
-          <div className="grid h-full max-h-full min-h-0 grid-cols-1 gap-6 overflow-hidden p-0 md:grid-cols-[1.8fr_1fr] md:p-6">
-            <div className="relative h-full max-h-[46vh] overflow-hidden rounded-[1.75rem] bg-background-tertiary md:max-h-[60vh] md:h-full">
+          <div className="grid min-h-[24rem] max-h-full grid-cols-1 gap-6 overflow-hidden p-0 md:grid-cols-[1.8fr_1fr] md:p-6">
+            <div className="relative h-[24rem] overflow-hidden rounded-[1.75rem] bg-background-tertiary md:h-auto md:max-h-[60vh]">
               {project.type === 'video' ? (
                 <video
                   src={project.src}
@@ -262,12 +265,12 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
             </div>
 
             <div className="flex min-h-0 flex-col justify-between overflow-hidden rounded-[1.75rem] bg-background-secondary">
-              <div className="overflow-auto p-6 md:p-8">
+              <div className="flex-1 min-h-0 overflow-y-auto p-6 md:p-8">
                 <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-primary border border-primary/20">
                   {project.category}
                 </span>
 
-                <h2 className="mt-5 text-3xl md:text-4xl font-bold text-text leading-tight">
+                <h2 id="project-modal-title" className="mt-5 text-3xl md:text-4xl font-bold text-text leading-tight">
                   {project.title}
                 </h2>
 
@@ -340,7 +343,8 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
           </div>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
+  </motion.div>
   )
 }
 
@@ -379,7 +383,7 @@ function Projects(_props: ProjectsProps): JSX.Element {
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Header */}
         <motion.div 
-          className="text-center max-w-2xl mx-auto mb-20"
+          className="text-center max-w-2xl mx-auto mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
@@ -392,16 +396,16 @@ function Projects(_props: ProjectsProps): JSX.Element {
           >
             Portfolio
           </motion.span>
-          <h2 className="text-4xl md:text-5xl font-display font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-display font-bold mb-4">
             Featured <span className="bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">Projects</span>
           </h2>
-          <p className="text-lg text-text-secondary leading-relaxed">
-            A unified gallery of featured work and archive assets presented in a single premium layout.
+          <p className="text-base md:text-lg text-text-secondary leading-relaxed">
+            Explore a curated selection of responsive UI work, motion design, and visual asset concepts.
           </p>
         </motion.div>
 
-        {/* Masonry Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-max mb-16">
+        {/* Project Grid */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3 mb-16">
           {allProjects.map((project, index) => (
             <ProjectCard 
               key={index} 

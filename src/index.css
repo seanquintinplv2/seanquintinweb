@@ -79,6 +79,10 @@ body {
   transition: background 0.4s ease, color 0.4s ease;
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 .hero-overlay-glow {
   position: absolute;
   inset: 0;

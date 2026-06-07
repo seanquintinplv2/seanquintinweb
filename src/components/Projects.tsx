@@ -201,7 +201,27 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
   const contentRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    document.body.classList.add('modal-open')
+    // Lock scroll by fixing the body in place and preserving scroll position
+    const scrollY = window.scrollY || window.pageYOffset || 0
+
+    const prev = {
+      position: document.body.style.position,
+      top: document.body.style.top,
+      left: document.body.style.left,
+      width: document.body.style.width,
+      overflow: document.body.style.overflow,
+      paddingRight: document.body.style.paddingRight
+    }
+
+    // Compensate for scrollbar disappearance to avoid layout shift
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
+    if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`
+
+    document.body.style.position = 'fixed'
+    document.body.style.top = `-${scrollY}px`
+    document.body.style.left = '0'
+    document.body.style.width = '100%'
+    document.body.style.overflow = 'hidden'
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -210,7 +230,17 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
     document.addEventListener('keydown', handleKeyDown)
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-      document.body.classList.remove('modal-open')
+
+      // restore previous body styles
+      document.body.style.position = prev.position
+      document.body.style.top = prev.top
+      document.body.style.left = prev.left
+      document.body.style.width = prev.width
+      document.body.style.overflow = prev.overflow
+      document.body.style.paddingRight = prev.paddingRight
+
+      // restore scroll position
+      window.scrollTo(0, scrollY)
     }
   }, [onClose])
 

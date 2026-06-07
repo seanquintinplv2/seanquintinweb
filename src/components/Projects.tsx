@@ -1,6 +1,7 @@
 import { featureAssets, visualAssets, videoAssets } from '../data/visualAssets'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 
 type ProjectItem = {
   category: string
@@ -197,45 +198,47 @@ function ProjectCard({ project, index, onOpen }: { project: ProjectItem, index: 
 }
 
 function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectItem | null, onClose: () => void, onNext: () => void, onPrev: () => void }) {
+  const contentRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
     document.body.classList.add('modal-open')
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        onClose()
-      }
+      if (event.key === 'Escape') onClose()
     }
 
     document.addEventListener('keydown', handleKeyDown)
-
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
       document.body.classList.remove('modal-open')
     }
   }, [onClose])
 
+  useEffect(() => {
+    // Reset internal scroll when a project opens
+    if (contentRef.current) contentRef.current.scrollTop = 0
+  }, [project])
+
   if (!project) return null
 
-  return (
+  const modal = (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="project-modal-title"
     >
-      <div className="absolute inset-0 overflow-y-auto px-4 py-6 sm:px-6 sm:py-8">
-        <motion.div
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          onClick={(e) => e.stopPropagation()}
-          className="relative mx-auto flex w-full max-w-6xl items-start justify-center"
-        >
-        <div className="w-full max-h-[calc(min(100vh,100dvh)-4rem)] overflow-hidden rounded-[2rem] bg-background-secondary shadow-2xl border border-white/10">
+      <motion.div
+        initial={{ scale: 0.95, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="w-[95vw] max-w-[1200px] max-h-[90vh] overflow-hidden rounded-[2rem] bg-background-secondary shadow-2xl border border-white/10"
+      >
           <button
             onClick={onClose}
             className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition-colors backdrop-blur-md"
@@ -341,11 +344,11 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectIt
               </div>
             </div>
           </div>
-        </div>
       </motion.div>
-    </div>
-  </motion.div>
+    </motion.div>
   )
+
+  return createPortal(modal, document.body)
 }
 
 type ProjectsProps = {

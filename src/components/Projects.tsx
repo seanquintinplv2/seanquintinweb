@@ -2,11 +2,18 @@ import { featureAssets, visualAssets, videoAssets } from '../data/visualAssets'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
 
-interface ProjectsProps {
-  onNavigate?: (page: 'home' | 'about' | 'projects' | 'contact') => void
+type ProjectItem = {
+  category: string
+  title: string
+  description: string
+  type: 'image' | 'video' | 'pdf'
+  src: string
+  tags: string[]
+  size: 'large' | 'medium' | 'small'
+  pdfSrc?: string
 }
 
-const featuredProjects = [
+const featuredProjects: ProjectItem[] = [
   {
     category: 'Website',
     title: 'Malanday Edutrack',
@@ -63,6 +70,23 @@ const featuredProjects = [
   }
 ]
 
+const archiveProjects: ProjectItem[] = visualAssets.map((asset, index) => ({
+  category: asset.type === 'video' ? 'Motion Archive' : asset.type === 'pdf' ? 'Document Archive' : 'Visual Archive',
+  title: asset.title,
+  description: asset.type === 'video'
+    ? 'A motion asset from the archive showcasing pacing, atmosphere, and visual storytelling.'
+    : asset.type === 'pdf'
+      ? 'A stored document preview with archive details and downloadable access.'
+      : 'A premium visual archive asset polished for presentation and storytelling.',
+  type: asset.type as 'image' | 'video' | 'pdf',
+  src: asset.type === 'pdf' ? asset.preview ?? asset.src : asset.src,
+  pdfSrc: asset.type === 'pdf' ? asset.src : undefined,
+  tags: [asset.type === 'video' ? 'Motion' : asset.type === 'pdf' ? 'PDF' : 'Visual', 'Archive'],
+  size: index % 5 === 0 ? 'medium' : 'small'
+}))
+
+const allProjects: ProjectItem[] = [...featuredProjects, ...archiveProjects]
+
 const getSizeClasses = (size: string) => {
   switch(size) {
     case 'large': return 'md:col-span-2 md:row-span-2'
@@ -81,7 +105,7 @@ const getImageHeight = (size: string) => {
   }
 }
 
-function ProjectCard({ project, index, onOpen }: { project: typeof featuredProjects[0], index: number, onOpen: () => void }) {
+function ProjectCard({ project, index, onOpen }: { project: ProjectItem, index: number, onOpen: () => void }) {
   const [isHovered, setIsHovered] = useState(false)
 
   return (
@@ -190,7 +214,7 @@ function ProjectCard({ project, index, onOpen }: { project: typeof featuredProje
   )
 }
 
-function ProjectModal({ project, onClose, onNext, onPrev }: { project: typeof featuredProjects[0] | null, onClose: () => void, onNext: () => void, onPrev: () => void }) {
+function ProjectModal({ project, onClose, onNext, onPrev }: { project: ProjectItem | null, onClose: () => void, onNext: () => void, onPrev: () => void }) {
   if (!project) return null
 
   return (
@@ -199,118 +223,148 @@ function ProjectModal({ project, onClose, onNext, onPrev }: { project: typeof fe
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 overflow-hidden bg-black/80 backdrop-blur-sm"
     >
       <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
+        initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.8, opacity: 0 }}
+        exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative w-full max-w-5xl max-h-[90vh] mx-4 rounded-2xl overflow-hidden bg-background-secondary"
+        className="absolute inset-0 m-4 mx-auto flex min-h-0 max-h-[calc(100%-2rem)] w-full max-w-6xl items-center justify-center"
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition-colors backdrop-blur-md"
-          aria-label="Close modal"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-
-        {/* Content */}
-        <div className="max-h-[90vh] overflow-y-auto">
-          {/* Media */}
-          <div className="relative w-full bg-background-tertiary max-h-[60vh] overflow-hidden">
-            {project.type === 'video' ? (
-              <video 
-                src={project.src}
-                controls
-                autoPlay
-                className="w-full h-full object-contain"
-              />
-            ) : (
-              <img 
-                src={project.src} 
-                alt={project.title}
-                className="w-full h-full object-contain"
-              />
-            )}
-          </div>
-
-          {/* Details */}
-          <div className="p-8 md:p-12">
-            <div className="flex items-start justify-between mb-6">
-              <div>
-                <span className="inline-block text-xs font-bold uppercase tracking-widest text-primary mb-4 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                  {project.category}
-                </span>
-                <h2 className="text-4xl md:text-5xl font-bold text-text mb-4 leading-tight">
-                  {project.title}
-                </h2>
-              </div>
-            </div>
-
-            <p className="text-lg text-text-secondary leading-relaxed mb-8 max-w-2xl">
-              {project.description}
-            </p>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-3 mb-8">
-              {project.tags.map((tag, idx) => (
-                <span 
-                  key={idx}
-                  className="px-4 py-2 rounded-full bg-background-tertiary border border-border text-text-secondary font-medium text-sm"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="sticky bottom-0 flex items-center justify-between p-6 bg-gradient-to-t from-background-secondary to-transparent border-t border-border">
-          <button
-            onClick={onPrev}
-            className="flex items-center gap-2 px-6 py-3 rounded-full border border-border text-text hover:border-primary hover:text-primary transition-colors"
-          >
-            <span>←</span> Previous
-          </button>
-
+        <div className="relative w-full max-h-[calc(100vh-3.5rem)] h-auto overflow-hidden rounded-[2rem] bg-background-secondary shadow-2xl border border-white/10">
           <button
             onClick={onClose}
-            className="px-6 py-3 rounded-full bg-primary text-white hover:bg-primary-hover transition-colors font-medium"
+            className="absolute top-5 right-5 z-10 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white transition-colors backdrop-blur-md"
+            aria-label="Close modal"
           >
-            Close
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
 
-          <button
-            onClick={onNext}
-            className="flex items-center gap-2 px-6 py-3 rounded-full border border-border text-text hover:border-primary hover:text-primary transition-colors"
-          >
-            Next <span>→</span>
-          </button>
+          <div className="grid h-full max-h-full min-h-0 grid-cols-1 gap-6 overflow-hidden p-0 md:grid-cols-[1.8fr_1fr] md:p-6">
+            <div className="relative h-full max-h-[46vh] overflow-hidden rounded-[1.75rem] bg-background-tertiary md:max-h-[60vh] md:h-full">
+              {project.type === 'video' ? (
+                <video
+                  src={project.src}
+                  controls
+                  autoPlay
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <img
+                  src={project.src}
+                  alt={project.title}
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </div>
+
+            <div className="flex min-h-0 flex-col justify-between overflow-hidden rounded-[1.75rem] bg-background-secondary">
+              <div className="overflow-auto p-6 md:p-8">
+                <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-[0.24em] text-primary border border-primary/20">
+                  {project.category}
+                </span>
+
+                <h2 className="mt-5 text-3xl md:text-4xl font-bold text-text leading-tight">
+                  {project.title}
+                </h2>
+
+                <p className="mt-5 text-sm md:text-base text-text-secondary leading-relaxed max-w-prose">
+                  {project.description}
+                </p>
+
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-3xl bg-background-tertiary p-4 border border-border">
+                    <p className="text-[0.675rem] uppercase tracking-[0.24em] text-gray-400 mb-2">Type</p>
+                    <p className="text-sm font-semibold text-text">{project.type === 'pdf' ? 'PDF Document' : project.type === 'video' ? 'Video Presentation' : 'Image Showcase'}</p>
+                  </div>
+                  <div className="rounded-3xl bg-background-tertiary p-4 border border-border">
+                    <p className="text-[0.675rem] uppercase tracking-[0.24em] text-gray-400 mb-2">Scope</p>
+                    <p className="text-sm font-semibold text-text">{project.tags.join(' · ')}</p>
+                  </div>
+                </div>
+
+                <div className="mt-8">
+                  <p className="text-sm uppercase tracking-[0.24em] text-gray-400 mb-3">Key features</p>
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag, idx) => (
+                      <span
+                        key={idx}
+                        className="rounded-full bg-background-tertiary px-3 py-2 text-xs font-medium text-text-secondary border border-border"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {project.type === 'pdf' && project.pdfSrc && (
+                  <a
+                    href={project.pdfSrc}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-8 inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                  >
+                    Open PDF Preview
+                  </a>
+                )}
+              </div>
+
+              <div className="border-t border-border p-4 md:p-6 bg-background-secondary">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <button
+                    onClick={onPrev}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-4 py-3 text-sm font-medium text-text transition-colors hover:border-primary hover:text-primary"
+                  >
+                    ← Previous
+                  </button>
+
+                  <button
+                    onClick={onClose}
+                    className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-hover"
+                  >
+                    Close
+                  </button>
+
+                  <button
+                    onClick={onNext}
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-border px-4 py-3 text-sm font-medium text-text transition-colors hover:border-primary hover:text-primary"
+                  >
+                    Next →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </motion.div>
     </motion.div>
   )
 }
 
-function Projects({ onNavigate }: ProjectsProps) {
+type ProjectsProps = {
+  onNavigate?: (page: 'home' | 'about' | 'projects' | 'contact') => void
+}
+
+function Projects(_props: ProjectsProps): JSX.Element {
   const [selectedProjectIndex, setSelectedProjectIndex] = useState<number | null>(null)
-  const selectedProject = selectedProjectIndex !== null ? featuredProjects[selectedProjectIndex] : null
+  const selectedProject = selectedProjectIndex !== null ? allProjects[selectedProjectIndex] : null
+
+  const handleOpenProject = (index: number) => {
+    setSelectedProjectIndex(index)
+  }
 
   const handleNextProject = () => {
     if (selectedProjectIndex !== null) {
-      setSelectedProjectIndex((selectedProjectIndex + 1) % featuredProjects.length)
+      setSelectedProjectIndex((selectedProjectIndex + 1) % allProjects.length)
     }
   }
 
   const handlePrevProject = () => {
     if (selectedProjectIndex !== null) {
-      setSelectedProjectIndex((selectedProjectIndex - 1 + featuredProjects.length) % featuredProjects.length)
+      setSelectedProjectIndex((selectedProjectIndex - 1 + allProjects.length) % allProjects.length)
     }
   }
 
@@ -342,75 +396,20 @@ function Projects({ onNavigate }: ProjectsProps) {
             Featured <span className="bg-gradient-to-r from-primary via-primary to-primary/70 bg-clip-text text-transparent">Projects</span>
           </h2>
           <p className="text-lg text-text-secondary leading-relaxed">
-            A curated selection of premium work that demonstrates refined visual systems, polished digital interfaces, and imaginative storytelling.
+            A unified gallery of featured work and archive assets presented in a single premium layout.
           </p>
         </motion.div>
 
         {/* Masonry Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-max mb-16">
-          {featuredProjects.map((project, index) => (
+          {allProjects.map((project, index) => (
             <ProjectCard 
               key={index} 
               project={project} 
               index={index}
-              onOpen={() => setSelectedProjectIndex(index)}
+              onOpen={() => handleOpenProject(index)}
             />
           ))}
-        </div>
-
-        <div className="mt-16 text-center">
-          {onNavigate ? (
-            <button
-              type="button"
-              onClick={() => onNavigate('contact')}
-              className="inline-flex items-center rounded-full border border-border-light px-8 py-3 text-text font-medium transition-all hover:border-primary hover:text-primary"
-            >
-              Commission a Premium Project
-            </button>
-          ) : (
-            <a href="#contact" className="inline-flex items-center rounded-full border border-border-light px-8 py-3 text-text font-medium transition-all hover:border-primary hover:text-primary">
-              Commission a Premium Project
-            </a>
-          )}
-        </div>
-
-        <div className="mt-24">
-          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <span className="inline-block text-sm font-semibold uppercase tracking-widest text-primary mb-2">Visual Archive</span>
-              <h3 className="text-3xl font-display font-bold text-text">Every existing asset brought into a cohesive premium gallery.</h3>
-            </div>
-            <div className="text-sm text-text-secondary">
-              Hover through the collection to explore imagery, motion, and polished creative assets.
-            </div>
-          </div>
-
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {visualAssets.map((asset, index) => (
-              <article key={index} className="overflow-hidden rounded-[2rem] border border-border bg-surface shadow-[0_18px_45px_rgba(0,0,0,0.20)] transition-colors duration-300 hover:border-primary/70 hover:bg-surface/95">
-                {asset.type === 'image' && (
-                  <img src={asset.src} alt={asset.title} className="h-64 w-full object-cover" />
-                )}
-                {asset.type === 'video' && (
-                  <video src={asset.src} muted loop playsInline controls className="h-64 w-full object-cover" />
-                )}
-                {asset.type === 'pdf' && (
-                  <a href={asset.src} target="_blank" rel="noreferrer" className="block h-64 overflow-hidden">
-                    <img src={asset.preview} alt={asset.title} className="h-full w-full object-cover" />
-                  </a>
-                )}
-                <div className="p-5 border-t border-border bg-background">
-                  <h4 className="text-lg font-semibold text-text mb-2">{asset.title}</h4>
-                  <p className="text-sm text-text-muted">{asset.type === 'pdf' ? 'Downloadable resume asset' : asset.type === 'video' ? 'Motion asset' : 'Visual asset'}</p>
-                  {asset.type === 'pdf' && (
-                    <a href={asset.src} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center text-sm font-medium text-primary hover:text-primary-hover">
-                      View PDF <span className="ml-2">↗</span>
-                    </a>
-                  )}
-                </div>
-              </article>
-            ))}
-          </div>
         </div>
       </div>
 

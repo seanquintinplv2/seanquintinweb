@@ -30,7 +30,15 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
   useEffect(() => {
     const handleScroll = () => {
       const currentY = window.scrollY
+      const isDesktop = window.matchMedia('(min-width: 768px)').matches
+
       setScrolled(currentY > 20)
+
+      if (!isDesktop || menuOpen) {
+        setHideNav(false)
+        lastScrollY.current = currentY
+        return
+      }
 
       if (currentY <= 20) {
         setHideNav(false)
@@ -46,11 +54,130 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  }, [menuOpen])
 
   const handleNavigate = (page: Page) => {
     setMenuOpen(false)
     onNavigate(page)
+  }
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return
+
+    const bodyElement = document.body
+
+    if (menuOpen) {
+      bodyElement.classList.add('modal-open')
+    } else {
+      bodyElement.classList.remove('modal-open')
+    }
+
+    return () => {
+      bodyElement.classList.remove('modal-open')
+    }
+  }, [menuOpen])
+
+  const MobileMenu = ({ open, onClose }: { open: boolean; onClose: () => void }) => {
+    return (
+      <AnimatePresence>
+        {open && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              className="fixed inset-0 z-[50000] bg-black/40"
+              onPointerDown={onClose}
+              style={{ touchAction: 'manipulation' }}
+            />
+
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed top-0 right-0 z-[50001] w-full max-w-sm h-screen md:hidden flex flex-col bg-background/95 backdrop-blur-3xl shadow-[-40px_0_120px_rgba(0,0,0,0.35)] rounded-l-[2.5rem] overflow-y-auto"
+              style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', pointerEvents: 'auto' }}
+            >
+              <div className="relative flex h-full flex-col justify-between px-5 pt-4 pb-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-end">
+                    <motion.button
+                      type="button"
+                      onPointerDown={onClose}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-surface/90 text-text transition hover:border-primary/50 hover:text-primary"
+                      aria-label="Close menu"
+                    >
+                      <X size={18} />
+                    </motion.button>
+                  </div>
+
+                  <nav className="mt-2">
+                    <ul className="space-y-3">
+                      {navLinks.map((link) => (
+                        <li key={link.name}>
+                          <button
+                            type="button"
+                            onPointerDown={() => {
+                              onClose()
+                              handleNavigate(link.page)
+                            }}
+                            className={`w-full rounded-3xl border px-5 py-4 text-left text-sm font-semibold ${
+                              activePage === link.page
+                                ? 'border-primary/30 bg-primary/15 text-primary'
+                                : 'border-border/60 bg-surface/90 text-text-secondary'
+                            }`}
+                          >
+                            {link.name}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                </div>
+
+                <div className="grid gap-3">
+                  <button
+                    type="button"
+                    onPointerDown={onToggleTheme}
+                    className="group flex items-center gap-3 rounded-3xl border border-border/60 bg-surface/90 px-4 py-4 text-sm font-semibold text-text"
+                  >
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      {theme === 'dark' ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+                          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79Z" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
+                          <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.36-7.36-1.42 1.42M7.05 16.95l-1.42 1.42M19.78 16.95l-1.42-1.42M7.05 7.05 5.64 5.64M12 6a6 6 0 100 12 6 6 0 000-12Z" />
+                        </svg>
+                      )}
+                    </span>
+                    <span>Night mode</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onPointerDown={onToggleMute}
+                    className="group flex items-center gap-3 rounded-3xl border border-border/60 bg-surface/90 px-4 py-4 text-sm font-semibold text-text"
+                    aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
+                    style={{ touchAction: 'manipulation' }}
+                  >
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                      <SoundBarIcon level={audioLevel} />
+                    </span>
+                    <span>{audioMuted ? 'Unmute audio' : 'Mute audio'}</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    )
   }
 
   if (activePage === 'home') {
@@ -62,7 +189,8 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
       initial={{ y: 0 }}
       animate={{ y: hideNav ? -100 : 0 }}
       transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-      className={`fixed left-0 right-0 top-0 z-50 ${scrolled ? 'bg-background/95 border-b border-border backdrop-blur-xl shadow-[0_30px_80px_rgba(0,0,0,0.12)]' : 'bg-transparent'}`}
+      className={`fixed left-0 right-0 top-0 z-[9999] ${scrolled ? 'bg-background/95 border-b border-border backdrop-blur-xl shadow-[0_30px_80px_rgba(0,0,0,0.12)]' : 'bg-transparent'}`}
+      style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
         {/* Logo */}
@@ -177,13 +305,20 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
           {/* Mobile Menu Toggle */}
           {(activePage as Page) !== 'home' && (
             <motion.button
-              type="button"
-              onClick={() => setMenuOpen((current) => !current)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary md:hidden"
-              aria-label="Toggle menu"
-            >
+                type="button"
+                onPointerDown={() => setMenuOpen((current) => !current)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault()
+                    setMenuOpen((current) => !current)
+                  }
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary md:hidden"
+                aria-label="Toggle menu"
+                style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
+              >
               <AnimatePresence mode="wait">
                 {menuOpen ? (
                   <motion.div
@@ -212,120 +347,8 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {menuOpen && (activePage as Page) !== 'home' && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-              onClick={() => setMenuOpen(false)}
-            />
-            <motion.div
-              initial={{ x: '100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '100%' }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm flex-col overflow-hidden rounded-l-[2.5rem] border-l border-border/40 bg-background/95 backdrop-blur-3xl shadow-[0_40px_120px_rgba(0,0,0,0.35)] md:hidden"
-            >
-              <div className="relative flex h-full flex-col justify-between px-5 pt-4 pb-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-end">
-                    <motion.button
-                      type="button"
-                      onClick={() => setMenuOpen(false)}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-surface/90 text-text transition hover:border-primary/50 hover:text-primary"
-                      aria-label="Close menu"
-                    >
-                      <X size={18} />
-                    </motion.button>
-                  </div>
-
-                  <motion.ul className="space-y-3">
-                    {navLinks.map((link, index) => (
-                      <motion.li
-                        key={link.name}
-                        initial={{ opacity: 0, x: 24 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: index * 0.05, duration: 0.28, type: 'spring', stiffness: 280, damping: 24 }}
-                      >
-                        <motion.button
-                          type="button"
-                          onClick={() => handleNavigate(link.page)}
-                          whileHover={{ x: 4 }}
-                          whileTap={{ scale: 0.98 }}
-                          className={`w-full rounded-3xl border px-5 py-4 text-left text-sm font-semibold transition-all duration-300 ${
-                            activePage === link.page
-                              ? 'border-primary/30 bg-primary/15 text-primary shadow-[inset_0_0_0_1px_rgba(191,165,106,0.12)]'
-                              : 'border-border/60 bg-surface/90 text-text-secondary hover:border-primary/40 hover:bg-surface-hover hover:text-text'
-                          }`}
-                        >
-                          {link.name}
-                        </motion.button>
-                      </motion.li>
-                    ))}
-                  </motion.ul>
-                </div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2, duration: 0.3 }}
-                  className="grid gap-3"
-                >
-                  <motion.button
-                    type="button"
-                    onClick={onToggleTheme}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group flex items-center gap-3 rounded-3xl border border-border/60 bg-surface/90 px-4 py-4 text-sm font-semibold text-text transition hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                    aria-label="Toggle theme"
-                  >
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                      {theme === 'dark' ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
-                          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79Z" />
-                        </svg>
-                      ) : (
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-5 w-5 fill-current">
-                          <path d="M12 2v2m0 16v2m10-10h-2M4 12H2m15.36-7.36-1.42 1.42M7.05 16.95l-1.42 1.42M19.78 16.95l-1.42-1.42M7.05 7.05 5.64 5.64M12 6a6 6 0 100 12 6 6 0 000-12Z" />
-                        </svg>
-                      )}
-                    </span>
-                    <span>Night mode</span>
-                  </motion.button>
-
-                  <motion.button
-                    type="button"
-                    onPointerDown={onToggleMute}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault()
-                        onToggleMute()
-                      }
-                    }}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className="group flex items-center gap-3 rounded-3xl border border-border/60 bg-surface/90 px-4 py-4 text-sm font-semibold text-text transition hover:border-primary/50 hover:bg-primary/10 hover:text-primary"
-                    aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
-                    style={{ touchAction: 'manipulation' }}
-                  >
-                    <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                      <SoundBarIcon level={audioLevel} />
-                    </span>
-                    <span>{audioMuted ? 'Unmute audio' : 'Mute audio'}</span>
-                  </motion.button>
-                </motion.div>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+      {/* Mobile Menu (replaced by simpler, reliable MobileMenu) */}
+      <MobileMenu open={menuOpen && (activePage as Page) !== 'home'} onClose={() => setMenuOpen(false)} />
     </motion.nav>
   )
 }

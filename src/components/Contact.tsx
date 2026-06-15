@@ -1,3 +1,24 @@
+const socialLinks = [
+  {
+    name: 'FB',
+    href: 'https://www.facebook.com/Shinon.2324',
+    icon: new URL('../../assets/fb.png', import.meta.url).href,
+    alt: 'Facebook',
+  },
+  {
+    name: 'IG',
+    href: 'https://www.instagram.com/seaniee_quintin/',
+    icon: new URL('../../assets/ig.png', import.meta.url).href,
+    alt: 'Instagram',
+  },
+  {
+    name: 'LI',
+    href: 'https://www.linkedin.com/in/sean-quintin-de-guzman-28989636b/',
+    icon: new URL('../../assets/li.png', import.meta.url).href,
+    alt: 'LinkedIn',
+  },
+]
+
 function Contact() {
   return (
     <section id="contact" className="py-24 bg-background-secondary relative overflow-hidden">
@@ -40,13 +61,13 @@ function Contact() {
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-text-muted mb-4">Follow Me</h4>
               <div className="flex flex-wrap gap-3">
-                {['FB', 'TW', 'IG', 'LI'].map((social) => (
+                {socialLinks.map((social) => (
                   <a 
-                    key={social}
-                    href="#" 
-                    className="flex h-11 w-11 items-center justify-center rounded-3xl border border-border bg-surface text-sm font-semibold text-text-secondary transition-colors duration-300 hover:border-primary hover:text-primary"
+                    key={social.name}
+                    href={social.href}
+                    className="flex h-11 w-11 items-center justify-center rounded-3xl border border-border bg-surface transition-colors duration-300 hover:border-primary"
                   >
-                    {social}
+                    <img src={social.icon} alt={social.alt} className="h-6 w-6 object-contain" />
                   </a>
                 ))}
               </div>

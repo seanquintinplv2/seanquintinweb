@@ -26,6 +26,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
   const [hideNav, setHideNav] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const lastScrollY = useRef(0)
+  const [menuAnimating, setMenuAnimating] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,6 +62,22 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
     onNavigate(page)
   }
 
+  const openCloseDelay = 420
+
+  const toggleMenu = () => {
+    if (menuAnimating) return
+    setMenuAnimating(true)
+    setMenuOpen((current) => !current)
+    window.setTimeout(() => setMenuAnimating(false), openCloseDelay)
+  }
+
+  const closeMenu = () => {
+    if (menuAnimating) return
+    setMenuAnimating(true)
+    setMenuOpen(false)
+    window.setTimeout(() => setMenuAnimating(false), openCloseDelay)
+  }
+
   useEffect(() => {
     if (typeof document === 'undefined') return
 
@@ -88,7 +105,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
               exit={{ opacity: 0 }}
               transition={{ duration: 0.18 }}
               className="fixed inset-0 z-[50000] bg-black/40"
-              onPointerDown={onClose}
+              onClick={onClose}
               style={{ touchAction: 'manipulation' }}
             />
 
@@ -98,6 +115,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
               exit={{ x: '100%' }}
               transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
               className="fixed top-0 right-0 z-[50001] w-full max-w-sm h-screen md:hidden flex flex-col bg-background/95 backdrop-blur-3xl shadow-[-40px_0_120px_rgba(0,0,0,0.35)] rounded-l-[2.5rem] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
               style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y', pointerEvents: 'auto' }}
             >
               <div className="relative flex h-full flex-col justify-between px-5 pt-4 pb-6">
@@ -105,7 +123,10 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
                   <div className="flex items-center justify-end">
                     <motion.button
                       type="button"
-                      onPointerDown={onClose}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onClose()
+                      }}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-border/60 bg-surface/90 text-text transition hover:border-primary/50 hover:text-primary"
@@ -121,7 +142,8 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
                         <li key={link.name}>
                           <button
                             type="button"
-                            onPointerDown={() => {
+                            onClick={(e) => {
+                              e.stopPropagation()
                               onClose()
                               handleNavigate(link.page)
                             }}
@@ -142,7 +164,10 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
                 <div className="grid gap-3">
                   <button
                     type="button"
-                    onPointerDown={onToggleTheme}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onToggleTheme()
+                    }}
                     className="group flex items-center gap-3 rounded-3xl border border-border/60 bg-surface/90 px-4 py-4 text-sm font-semibold text-text"
                   >
                     <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -161,7 +186,10 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
 
                   <button
                     type="button"
-                    onPointerDown={onToggleMute}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onToggleMute()
+                    }}
                     className="group flex items-center gap-3 rounded-3xl border border-border/60 bg-surface/90 px-4 py-4 text-sm font-semibold text-text"
                     aria-label={audioMuted ? 'Unmute audio' : 'Mute audio'}
                     style={{ touchAction: 'manipulation' }}
@@ -286,7 +314,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
           {/* Audio Toggle */}
           <motion.button
             type="button"
-            onPointerDown={onToggleMute}
+            onClick={onToggleMute}
             onKeyDown={(event) => {
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault()
@@ -305,18 +333,19 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
           {/* Mobile Menu Toggle */}
           {(activePage as Page) !== 'home' && (
             <motion.button
-                type="button"
-                onPointerDown={() => setMenuOpen((current) => !current)}
+              type="button"
+              onClick={toggleMenu}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault()
-                    setMenuOpen((current) => !current)
+                    toggleMenu()
                   }
                 }}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="inline-flex h-9 sm:h-11 w-9 sm:w-11 items-center justify-center rounded-full border border-border bg-surface text-text transition hover:border-primary hover:text-primary md:hidden"
                 aria-label="Toggle menu"
+                aria-expanded={menuOpen}
                 style={{ touchAction: 'manipulation', pointerEvents: 'auto' }}
               >
               <AnimatePresence mode="wait">
@@ -348,7 +377,7 @@ function Navbar({ activePage, onNavigate, theme, onToggleTheme, audioMuted, audi
       </div>
 
       {/* Mobile Menu (replaced by simpler, reliable MobileMenu) */}
-      <MobileMenu open={menuOpen && (activePage as Page) !== 'home'} onClose={() => setMenuOpen(false)} />
+      <MobileMenu open={menuOpen && (activePage as Page) !== 'home'} onClose={closeMenu} />
     </motion.nav>
   )
 }

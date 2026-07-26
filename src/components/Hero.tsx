@@ -23,7 +23,7 @@ function Hero({ onNavigate }: HeroProps) {
           SEAN QUINTIN
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-sm md:text-base uppercase tracking-[0.28em] text-text-secondary">
-          GRAPHIC DESIGNER| FRONT-ENDDEVELOPER | 3D MODELING
+          UI/UX DESIGNER| FRONT-END DEVELOPER | 3D MODELING
         </p>
 
         <nav className="mt-14 inline-flex flex-wrap items-center justify-center gap-10 uppercase tracking-[0.28em] text-text-secondary">
